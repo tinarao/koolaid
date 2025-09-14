@@ -17,3 +17,15 @@ export async function createSession() {
   const { key }: CreateSessionResponse = await response.json();
   return { ok: true, key };
 }
+
+export async function isSessionExists(key?: string) {
+  if (!key) return false;
+  const route = getApiUrl() + "/api/sessions/exists/" + key;
+
+  const response = await fetch(route);
+  if (!response.ok) {
+    return false;
+  }
+
+  return true;
+}

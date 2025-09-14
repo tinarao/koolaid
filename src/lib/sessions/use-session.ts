@@ -12,7 +12,7 @@ function createTopic(key: string): SessionKey {
 interface StartCallbacks {
   onStart?: () => void;
   onBroadcast?: (code: string) => void;
-  onError?: () => void;
+  onError?: (err: string) => void;
 }
 
 export function useSession() {
@@ -37,9 +37,9 @@ export function useSession() {
         .receive("ok", (_) => {
           onStart?.();
         })
-        .receive("error", ({ error }: { error: string }) => {
-          console.error(error);
-          onError?.();
+        .receive("error", ({ reason }: { reason: string }) => {
+          console.error(reason);
+          onError?.(reason);
         });
 
       _channel.on("broadcast", ({ message }: { message: string }) => {
