@@ -20,9 +20,10 @@ import { LANGUAGES } from "@/lib/piston/constants"
 
 type RuntimeSelectProps = {
     onSelect?: (lang: Language) => void
+    disabled?: boolean
 }
 
-export function RuntimeSelect({ onSelect }: RuntimeSelectProps) {
+export function RuntimeSelect({ onSelect, disabled = false }: RuntimeSelectProps) {
     const [open, setOpen] = useState(false)
     const [value, setValue] = useState("")
 
@@ -30,6 +31,7 @@ export function RuntimeSelect({ onSelect }: RuntimeSelectProps) {
         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    disabled={disabled}
                     variant="outline"
                     role="combobox"
                     aria-expanded={open}

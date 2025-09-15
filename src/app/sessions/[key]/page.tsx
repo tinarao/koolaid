@@ -1,24 +1,26 @@
 "use client"
 
+import { CodeExecutionResult } from "@/components/editor/code-execution-result";
 import { CodeEditor } from "@/components/editor/editor";
 import { RuntimeSelect } from "@/components/selects/runtime-select";
 import { Button } from "@/components/ui/button";
 import { execute } from "@/lib/piston/actions";
-import { Language } from "@/lib/piston/piston";
+import { ExecutionResult, Language } from "@/lib/piston/piston";
 import { useSession } from "@/lib/sessions/use-session";
 import { cn } from "@/lib/utils";
-import { CopyIcon, PlayIcon } from "lucide-react";
+import { CopyIcon, LoaderCircleIcon, PlayIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export default function ProjectPage() {
+    const [code, setCode] = useState("")
+    const [language, setLanguage] = useState<Language | null>(null)
+    const [codeExecutionResult, setCodeExecutionResult] = useState<ExecutionResult | null>(null)
     const [pending, startTransition] = useTransition()
     const { key }: { key: string } = useParams()
     const session = useSession()
     const router = useRouter()
-    const [code, setCode] = useState("")
-    const [language, setLanguage] = useState<Language | null>(null)
 
     useEffect(() => {
         session.start(key, {
@@ -34,7 +36,6 @@ export default function ProjectPage() {
             },
             onBroadcast(pCode) {
                 setCode(pCode)
-                console.log("pCode:", pCode)
             },
         })
 
@@ -42,9 +43,8 @@ export default function ProjectPage() {
     }, [])
 
     function handleCodeChange(pCode?: string) {
-        if (pCode) {
-            session.sendMessage(pCode)
-        }
+        if (!pCode) return;
+        session.sendMessage(pCode)
     }
 
     async function handleCopyKey() {
@@ -65,19 +65,18 @@ export default function ProjectPage() {
 
         startTransition(async () => {
             const result = await execute(code, language)
-            console.log(result)
+            setCodeExecutionResult(result)
         })
     }
 
     return (
         <div className="flex flex-col h-screen">
-            {language}
             <header className="flex items-center justify-between px-8 py-4">
                 <div className="flex items-center gap-x-2">
-                    <RuntimeSelect onSelect={setLanguage} />
-                    <Button size="icon" className="size-8" onClick={handleRunCode} disabled={pending}>
-                        <PlayIcon />
+                    <Button size="icon" onClick={handleRunCode} disabled={pending || !language}>
+                        {pending ? <LoaderCircleIcon className="animate-spin" /> : <PlayIcon />}
                     </Button>
+                    <RuntimeSelect onSelect={setLanguage} disabled={pending} />
                 </div>
                 <div className="flex items-center gap-x-4">
                     <div
@@ -95,7 +94,7 @@ export default function ProjectPage() {
                     <CodeEditor code={code} onChange={handleCodeChange} language={language} />
                 </div>
                 <div>
-                    TODO piston
+                    <CodeExecutionResult loading={pending} result={codeExecutionResult} />
                 </div>
             </div>
         </div>

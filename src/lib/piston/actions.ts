@@ -2,7 +2,7 @@
 
 import piston from "piston-client";
 import {
-  language,
+  type Language,
   type ExecutionResult,
   type PistonClient,
   type Result,
@@ -11,7 +11,7 @@ import {
 
 const PISTON_API_HOST = "https://emkc.org" as const;
 
-export async function execute(code: string, lang: language) {
+export async function execute(code: string, lang: Language) {
   const client: PistonClient = piston({
     server: PISTON_API_HOST,
   });
