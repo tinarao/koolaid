@@ -5,7 +5,7 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { useRef, useTransition } from "react"
 import { toast } from "sonner"
-import { isSessionExists } from "@/lib/sessions/actions"
+import { isSessionExists } from "@/lib/sessions"
 import { useRouter } from "next/navigation"
 
 export function JoinSessionForm({ className = "" }: { className?: string }) {

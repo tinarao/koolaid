@@ -1,5 +1,3 @@
-"use server";
-
 import { getApiUrl } from "../utils";
 
 export async function createSession() {
@@ -28,4 +26,18 @@ export async function isSessionExists(key?: string) {
   }
 
   return true;
+}
+
+export async function deleteSession(key: string) {
+  const route = getApiUrl() + "/api/sessions/" + key;
+  const response = await fetch(route, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    return { ok: false, error: text };
+  }
+
+  return { ok: true };
 }

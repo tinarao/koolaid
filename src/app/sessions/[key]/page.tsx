@@ -1,5 +1,6 @@
 "use client"
 
+import { SessionSettingsDropdown } from "@/app/_components/session-settings-dropdown";
 import { CodeExecutionResult } from "@/components/editor/code-execution-result";
 import { CodeEditor } from "@/components/editor/editor";
 import { RuntimeSelect } from "@/components/selects/runtime-select";
@@ -8,7 +9,7 @@ import { execute } from "@/lib/piston/actions";
 import { ExecutionResult, Language } from "@/lib/piston/piston";
 import { useSession } from "@/lib/sessions/use-session";
 import { cn } from "@/lib/utils";
-import { CopyIcon, LoaderCircleIcon, PlayIcon } from "lucide-react";
+import { CogIcon, CopyIcon, LoaderCircleIcon, PlayIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -78,15 +79,20 @@ export default function ProjectPage() {
                     </Button>
                     <RuntimeSelect onSelect={setLanguage} disabled={pending} />
                 </div>
-                <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-2">
                     <div
-                        className={cn("size-4 animate-pulse rounded-full", session.isConnected ? "bg-green-500" : "bg-red-500")}
+                        className={cn("size-4 animate-pulse rounded-full mr-2", session.isConnected ? "bg-green-500" : "bg-red-500")}
                         title={session.isConnected ? "Соединение установлено" : "Соединение не установлено"}
                     />
                     <Button variant="secondary" title="Нажмите, чтобы скопировать ключ сессии" onClick={handleCopyKey}>
                         <CopyIcon />
                         {key}
                     </Button>
+                    <SessionSettingsDropdown sessionKey={key}>
+                        <Button size="icon" variant="outline">
+                            <CogIcon />
+                        </Button>
+                    </SessionSettingsDropdown>
                 </div>
             </header>
             <div className="grid grid-cols-1 lg:grid-cols-2 flex-1 gap-x-4 px-8 pb-8">
