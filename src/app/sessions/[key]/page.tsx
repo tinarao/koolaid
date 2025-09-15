@@ -1,19 +1,24 @@
 "use client"
 
 import { CodeEditor } from "@/components/editor/editor";
+import { RuntimeSelect } from "@/components/selects/runtime-select";
 import { Button } from "@/components/ui/button";
+import { execute } from "@/lib/piston/actions";
+import { Language } from "@/lib/piston/piston";
 import { useSession } from "@/lib/sessions/use-session";
 import { cn } from "@/lib/utils";
-import { CopyIcon, PlayIcon, SaveIcon } from "lucide-react";
+import { CopyIcon, PlayIcon } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 export default function ProjectPage() {
+    const [pending, startTransition] = useTransition()
     const { key }: { key: string } = useParams()
     const session = useSession()
     const router = useRouter()
     const [code, setCode] = useState("")
+    const [language, setLanguage] = useState<Language | null>(null)
 
     useEffect(() => {
         session.start(key, {
@@ -52,11 +57,25 @@ export default function ProjectPage() {
         }
     }
 
+    async function handleRunCode() {
+        if (!language) {
+            toast.error("Язык не выбран!")
+            return
+        }
+
+        startTransition(async () => {
+            const result = await execute(code, language)
+            console.log(result)
+        })
+    }
+
     return (
-        <div className="flex flex-col h-screen ">
+        <div className="flex flex-col h-screen">
+            {language}
             <header className="flex items-center justify-between px-8 py-4">
-                <div className="space-x-2">
-                    <Button size="icon" className="size-8" disabled>
+                <div className="flex items-center gap-x-2">
+                    <RuntimeSelect onSelect={setLanguage} />
+                    <Button size="icon" className="size-8" onClick={handleRunCode} disabled={pending}>
                         <PlayIcon />
                     </Button>
                 </div>
@@ -71,9 +90,9 @@ export default function ProjectPage() {
                     </Button>
                 </div>
             </header>
-            <div className="grid grid-cols-2 flex-1 gap-x-4 px-8 pb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 flex-1 gap-x-4 px-8 pb-8">
                 <div className="h-full">
-                    <CodeEditor code={code} onChange={handleCodeChange} />
+                    <CodeEditor code={code} onChange={handleCodeChange} language={language} />
                 </div>
                 <div>
                     TODO piston
